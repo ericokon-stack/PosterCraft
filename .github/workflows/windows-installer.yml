@@ -1,0 +1,34 @@
+name: Build Windows Installer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-installer:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Release
+        run: cargo build --release
+
+      - name: Build NSIS Installer
+        run: |
+          & "C:\Program Files (x86)\NSIS\makensis.exe" installer\installer.nsi
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: PosterCraft-Windows-Installer
+          path: installer\*.exe
